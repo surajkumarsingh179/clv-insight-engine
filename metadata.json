@@ -1,0 +1,5 @@
+{
+  "name": "CLV Insight Engine",
+  "description": "A data-driven framework that combines probabilistic models and machine learning to produce calibrated, individualized Customer Lifetime Value (CLV) estimates with uncertainty intervals and actionable segmentation for marketing decisions.",
+  "requestFramePermissions": []
+}
