@@ -6,9 +6,15 @@
   "scripts": {
     "build": "node build.mjs"
   },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.12.7",
+    "@google/genai": "^1.29.1",
+    "esbuild": "^0.21.4"
+  },
   "devDependencies": {
     "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "esbuild": "^0.21.4"
+    "@types/react-dom": "^18.3.0"
   }
 }
