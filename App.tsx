@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import CustomerList from './components/CustomerList';
 import CustomerDetail from './components/CustomerDetail';
 import Header from './components/Header';
+import AddCustomerModal from './components/AddCustomerModal';
 
 type View = 'dashboard' | 'customers';
 
@@ -16,6 +17,7 @@ const App: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingError, setProcessingError] = useState<string | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handleSelectCustomer = useCallback((customer: Customer) => {
     setSelectedCustomer(customer);
@@ -25,6 +27,11 @@ const App: React.FC = () => {
     setSelectedCustomer(null);
   }, []);
   
+  const handleAddNewCustomer = useCallback((newCustomer: Customer) => {
+    setCustomers(prevCustomers => [newCustomer, ...prevCustomers]);
+    setView('customers'); // Switch to customer view to see the new addition
+  }, []);
+
   const handleFileUpload = useCallback(async (file: File) => {
     setIsProcessing(true);
     setProcessingError(null);
@@ -74,6 +81,7 @@ const App: React.FC = () => {
             onFileUpload={handleFileUpload}
             isProcessing={isProcessing}
             processingError={processingError}
+            onOpenAddModal={() => setIsAddModalOpen(true)}
           />
         );
       default:
@@ -90,6 +98,11 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
       </div>
+      <AddCustomerModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAddCustomer={handleAddNewCustomer}
+      />
     </div>
   );
 };
