@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, ChangeEvent } from 'react';
 import type { Customer, CustomerSegment } from '../types';
-import { MagnifyingGlassIcon, ArrowUpTrayIcon } from './icons/Icons';
+import { MagnifyingGlassIcon, ArrowUpTrayIcon, PlusIcon } from './icons/Icons';
 
 interface CustomerListProps {
   customers: Customer[];
@@ -8,9 +8,10 @@ interface CustomerListProps {
   onFileUpload: (file: File) => void;
   isProcessing: boolean;
   processingError: string | null;
+  onOpenAddModal: () => void;
 }
 
-const CustomerList: React.FC<CustomerListProps> = ({ customers, onSelectCustomer, onFileUpload, isProcessing, processingError }) => {
+const CustomerList: React.FC<CustomerListProps> = ({ customers, onSelectCustomer, onFileUpload, isProcessing, processingError, onOpenAddModal }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -61,27 +62,35 @@ const CustomerList: React.FC<CustomerListProps> = ({ customers, onSelectCustomer
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg py-2 pl-10 pr-4 text-white focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            <div className="flex flex-col w-full sm:w-auto">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept=".csv"
-                    className="hidden"
-                />
-                <button 
-                    onClick={handleUploadClick}
-                    disabled={isProcessing}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold whitespace-nowrap disabled:bg-blue-800 disabled:cursor-not-allowed"
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                    onClick={onOpenAddModal}
+                    className="flex-1 sm:flex-none w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold whitespace-nowrap"
                 >
-                    <ArrowUpTrayIcon className={`h-5 w-5 ${isProcessing ? 'animate-pulse' : ''}`} />
-                    {isProcessing ? 'Processing...' : 'Upload Customer Data'}
+                    <PlusIcon className="h-5 w-5" />
+                    Add
                 </button>
-                 {processingError && <p className="text-xs text-red-400 mt-1 text-center sm:text-right">{processingError}</p>}
-                 {!processingError && <p className="text-xs text-gray-500 mt-1 text-center sm:text-right">Upload a .csv file</p>}
+                <div className="flex-1 sm:flex-none w-full flex flex-col">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept=".csv"
+                        className="hidden"
+                    />
+                    <button 
+                        onClick={handleUploadClick}
+                        disabled={isProcessing}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold whitespace-nowrap disabled:bg-blue-800 disabled:cursor-not-allowed"
+                    >
+                        <ArrowUpTrayIcon className={`h-5 w-5 ${isProcessing ? 'animate-pulse' : ''}`} />
+                        Upload
+                    </button>
+                </div>
             </div>
         </div>
       </div>
+      {processingError && <p className="text-xs text-red-400 text-right -mt-4 mb-4">{processingError}</p>}
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-gray-400">
           <thead className="text-xs text-gray-300 uppercase bg-gray-700/50">
