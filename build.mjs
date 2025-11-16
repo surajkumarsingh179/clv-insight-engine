@@ -1,5 +1,7 @@
 import esbuild from 'esbuild';
 import fs from 'fs/promises';
+// FIX: Explicitly import `process` to make its type available to the type checker and resolve the error on `process.exit`.
+import process from 'process';
 
 const outdir = 'dist';
 
@@ -18,6 +20,10 @@ try {
     sourcemap: true,
     // FIX: Exclude CDN-loaded packages from the bundle to resolve runtime conflict.
     external: ['react', 'react-dom/*', 'recharts', '@google/genai'],
+    // Injects the environment variable at build time to make it available in the browser.
+    define: {
+      'process.env.API_KEY': JSON.stringify(process.env.API_KEY),
+    },
   });
 
   // Copy index.html to dist
@@ -27,7 +33,5 @@ try {
 } catch (e) {
   console.error('❌ Build failed:', e);
   // Explicitly exit with a failure code to stop the build process.
-  // FIX: The explicit import for `process` was removed to rely on the global Node.js object, resolving the type error.
   process.exit(1);
 }
-
