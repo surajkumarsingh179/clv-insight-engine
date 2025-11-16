@@ -195,3 +195,51 @@ export const getMarketingRecommendations = async (customer: Customer): Promise<M
     throw new Error("Failed to get recommendations from Gemini API.");
   }
 };
+
+export const processSingleCustomer = async (customerData: Partial<Customer>): Promise<Customer> => {
+    const prompt = `
+        You are a data science expert specializing in the insurance industry. Your task is to process partial data for a single new customer and transform it into a structured JSON object.
+
+        Here is the known information about the customer:
+        - Customer ID: ${customerData.id}
+        - State: ${customerData.state}
+        - Coverage: ${customerData.coverage}
+        - Education: ${customerData.education}
+        - Income: ${customerData.income}
+        - Monthly Premium Auto: ${customerData.monthlyPremiumAuto}
+        - Months Since Last Claim: ${customerData.monthsSinceLastClaim}
+        - Number of Policies: ${customerData.numberOfPolicies}
+
+        Based on this partial information, you must perform the following steps to complete their profile:
+        1.  Complete the full JSON object for this customer. You can generate sensible defaults for missing fields like 'employmentStatus', 'gender', 'maritalStatus', etc.
+        2.  Generate the 'clvData' object. Use the provided values for Recency, Frequency, and Monetary proxies:
+            -   **recency**: Use the value from 'Months Since Last Claim'.
+            -   **frequency**: Use the value from 'Number of Policies'.
+            -   **monetary**: Use the value from 'Monthly Premium Auto'.
+        3.  Based on all available data, estimate a plausible Customer Lifetime Value ('clvEstimate'). A customer with high income, multiple policies, and a high premium should have a high CLV.
+        4.  Generate a realistic 95% confidence interval for the CLV estimate.
+        5.  Estimate a 'purchaseProbability' and 'expectedPurchases'.
+        6.  Assign a customer 'segment' ('Champion', 'Loyal', 'At Risk', 'Lost', 'Newcomer') that logically follows from the data.
+        7.  Generate a list of SHAP values (CLV drivers) that are consistent with the customer's profile.
+
+        Return ONLY the single, complete JSON object for this customer, adhering strictly to the provided JSON schema. Do not include any other text or explanations.
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-pro',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: customerObjectSchema,
+            },
+        });
+
+        const text = response.text;
+        const customer: Customer = JSON.parse(text);
+        return customer;
+    } catch (error) {
+        console.error("Error processing single customer:", error);
+        throw new Error("Failed to process new customer with Gemini API.");
+    }
+};
