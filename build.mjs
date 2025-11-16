@@ -1,6 +1,10 @@
 import esbuild from 'esbuild';
 import fs from 'fs/promises';
 
+// FIX: Import `process` from 'node:process' to provide correct type definitions
+// and resolve the "Property 'exit' does not exist on type 'Process'" error.
+import process from 'node:process';
+
 const outdir = 'dist';
 
 try {
@@ -24,5 +28,6 @@ try {
   console.log('✅ Build successful!');
 } catch (e) {
   console.error('❌ Build failed:', e);
+  // Explicitly exit with a failure code to stop the build process.
   process.exit(1);
 }
